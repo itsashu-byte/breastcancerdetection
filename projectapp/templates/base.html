@@ -1,0 +1,652 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Breast Cancer Detection</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css"
+        rel="stylesheet">
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #f8c4d0;
+            --secondary: #e8a0bf;
+            --cyan: #ffb6ca;
+            --dark: #3a2f2f;
+            --dark2: #2d1b1b;
+            --glass: rgba(248, 196, 208, 0.06);
+            --border: rgba(248, 196, 208, 0.12);
+            --white: #fffaff;
+            --text: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+           background:
+                radial-gradient(circle at top left, rgba(248, 196, 235, 0.25), transparent 30%),
+                radial-gradient(circle at top right, rgba(252, 107, 196, 0.18), transparent 30%),
+                radial-gradient(circle at bottom center, rgba(255, 96, 165, 0.15), transparent 35%),
+                var(--dark);
+            color: var(--white); 
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SCROLLBAR
+        ========================= */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        /* =========================
+           PRELOADER
+        ========================= */
+
+        #preloader {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            background: #020617;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 25px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 20px rgba(124, 77, 255, .6));
+        }
+
+        .loader-ring {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, .1);
+            border-top: 4px solid #ff4d8d;
+            border-right: 4px solid #7c4dff;
+            border-bottom: 4px solid #00c6ff;
+            margin: auto;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            color: white;
+            margin-top: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* =========================
+           BACKGROUND GLOW
+        ========================= */
+
+        .glow-1,
+        .glow-2 {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 0;
+            opacity: .4;
+        }
+
+        .glow-1 {
+            width: 400px;
+            height: 400px;
+            background: #7c4dff;
+            top: -150px;
+            left: -100px;
+        }
+
+        .glow-2 {
+            width: 350px;
+            height: 350px;
+            background: #00c6ff;
+            bottom: -120px;
+            right: -80px;
+        }   
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: rgba(255, 0, 157, 0.65);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            transition: .4s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(167, 0, 97, 0.95);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .4);
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(124, 77, 255, .5);
+        }
+
+        .navbar-toggler {
+            border: none;
+            background: rgba(255, 255, 255, .1);
+            padding: 8px 12px;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-weight: 500;
+            margin-left: 12px;
+            position: relative;
+            transition: .3s;
+        }
+
+        .nav-link i {
+            margin-right: 6px;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0%;
+            height: 2px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--cyan));
+            transition: .3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main-wrapper {
+            position: relative;
+            z-index: 2;
+            padding-top: 120px;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           GLASS CARD
+        ========================= */
+
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .35);
+            padding: 30px;
+            transition: .4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px rgba(124, 77, 255, .25);
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .btn-ai {
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--cyan));
+            transition: .4s;
+            box-shadow: 0 10px 25px rgba(124, 77, 255, .3);
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(124, 77, 255, .45);
+            color: white;
+        }
+
+        /* =========================
+           ALERTS
+        ========================= */
+
+        .alert {
+            border: none;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            margin-top: 100px;
+            border-top: 1px solid var(--border);
+            background: rgba(2, 6, 23, .85);
+            backdrop-filter: blur(20px);
+        }
+
+        .footer-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .footer-text {
+            color: var(--text);
+            font-size: .95rem;
+        }
+
+        .footer-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .08);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: .3s;
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-icon:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: translateY(-4px);
+            color: white;
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            margin-top: 25px;
+            padding-top: 20px;
+            color: #94a3b8;
+            font-size: .92rem;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media(max-width:991px) {
+
+            .nav-link {
+                margin: 10px 0;
+            }
+
+            .navbar-collapse {
+                padding-top: 15px;
+            }
+
+            .loader-logo {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =========================
+         PRELOADER
+    ========================== -->
+
+   <div id="preloader">
+
+        <div class="loader-content">
+
+            <!-- YOUR LOGO -->
+            <img src="{% static 'projectapp/hero_img.png' %}" alt="Logo" class="loader-logo">
+
+            <!-- LOADING SPINNER -->
+            <div class="loader-ring"></div>
+
+            <!-- TEXT -->
+            <h5 class="loader-text">
+                Loading AI System...
+            </h5>
+            <p>Developed By : Sania Zahara  | Hafsa Nasir | Nimra Sahar</p>
+        </div>
+
+    </div> 
+
+    <!-- Background Glow -->
+
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+
+        <div class="container">
+
+            <a class="navbar-brand" href="{% url 'home' %}">
+
+                <div class="brand-logo">
+                    <img src="{% static 'projectapp/hero_img.png' %}" alt="Logo" style="width: 100%;">
+                </div>
+
+                <span>AI Breast Cancer Detection</span>
+
+            </a>
+
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="fa-solid fa-house"></i> Home
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            <i class="fa-solid fa-user"></i> {{user.username}}
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fa-solid fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </a>
+                    </li>
+
+                    {% else %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fa-solid fa-right-to-bracket"></i> Login
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">
+                            <i class="fa-solid fa-user-plus"></i> Register
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <div class="main-wrapper">
+
+        <!-- ALERTS -->
+
+        <div class="container mb-4">
+
+            {% for message in messages %}
+
+            <div class="alert alert-{{message.tags}} shadow-sm" data-aos="fade-down">
+
+                <i class="fa-solid fa-circle-info me-2"></i>
+
+                {{message}}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- PAGE CONTENT -->
+
+        <div class="container">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+        <!-- =========================
+             FOOTER
+        ========================== -->
+
+        <footer class="py-5 mt-5">
+
+            <div class="container">
+
+                <div class="row g-4 align-items-center">
+
+                    <div class="col-lg-6">
+
+                        <h4 class="footer-title mb-3">
+
+                            <i class="fa-solid fa-heart-pulse me-2"></i>
+
+                            AI Breast Cancer Detection
+
+                        </h4>
+
+                        <p class="footer-text">
+
+                            Advanced Artificial Intelligence based breast cancer
+                            detection system designed for fast, accurate and secure
+                            medical analysis.
+
+                        </p>
+
+                    </div>
+
+                    <div class="col-lg-6 text-lg-end">
+
+                        <div class="d-flex justify-content-lg-end gap-3">
+
+                            <a href="#" class="footer-icon">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+
+                            <a href="#" class="footer-icon">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+
+                            <a href="#" class="footer-icon">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+
+                            <a href="#" class="footer-icon">
+                                <i class="fab fa-github"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="text-center copyright">
+
+                    © 2026 AI Breast Cancer Detection System | All Rights Reserved
+
+                </div>
+
+            </div>
+
+        </footer>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AOS JS -->
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- =========================
+         CUSTOM JS
+    ========================== -->
+
+    <script>
+
+        // AOS Animation
+
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+
+        // Navbar Scroll Effect
+
+        window.addEventListener("scroll", function () {
+
+            document.querySelector(".navbar")
+                .classList.toggle("scrolled", window.scrollY > 40);
+
+        });
+
+        // PRELOADER (MINIMUM 3 SECONDS)
+
+        window.addEventListener("load", function () {
+
+            const preloader = document.getElementById("preloader");
+
+            setTimeout(() => {
+
+                preloader.style.opacity = "0";
+                preloader.style.visibility = "hidden";
+                preloader.style.transition = "0.6s ease";
+
+            }, 3000);
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,600 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+:root {
+  {% comment %} --rose:        #e8647a; {% endcomment %}
+  --rose:        #10d9a0;
+  --rose-light:  #f5a0ae;
+  --rose-dark:   #c04460;
+  --gold:        #d4a96a;
+  --text-muted:  #8fa3b8;
+  --glass-bg:    rgba(255,255,255,0.04);
+  --glass-border:rgba(255,255,255,0.09);
+}
+
+body {
+  font-family: 'DM Sans','Inter','Segoe UI',sans-serif;
+  background:
+    radial-gradient(ellipse 70% 55% at 80% 15%, rgba(192,68,96,.14) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 50% at 15% 85%, rgba(30,51,81,.45) 0%, transparent 55%),
+    linear-gradient(160deg, #0d1b2a 0%, #152336 60%, #1a1028 100%) !important;
+  color: #e8eef4 !important;
+}
+
+/* ── WRAPPER ── */
+.reg-wrap {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* background glow */
+.reg-wrap::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,68,96,.1) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+
+/* rings */
+.bg-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(232,100,122,.06);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+  animation: rbreath 6s ease-in-out infinite;
+}
+.bg-ring:nth-child(1){ width:560px;  height:560px;  animation-delay:0s;   }
+.bg-ring:nth-child(2){ width:760px;  height:760px;  animation-delay:1.8s; }
+.bg-ring:nth-child(3){ width:980px;  height:980px;  animation-delay:3.4s; }
+@keyframes rbreath { 0%,100%{opacity:.35} 50%{opacity:.9} }
+
+/* ── CARD ── */
+.reg-card {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 560px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 26px;
+  padding: 42px 40px;
+  backdrop-filter: blur(22px);
+  animation: card-in .55s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes card-in {
+  from { opacity:0; transform:translateY(24px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── BRAND ── */
+.reg-brand { text-align:center; margin-bottom:26px; }
+.brand-name {
+  font-size: 1.55rem; font-weight: 700; color: #fff;
+  letter-spacing: -.01em;
+  font-family: Georgia,'Times New Roman',serif;
+}
+.brand-name span { color: var(--rose); }
+.brand-sub {
+  font-size: .75rem; color: var(--text-muted);
+  letter-spacing: .08em; text-transform: uppercase; margin-top: 3px;
+}
+
+.reg-divider { height:1px; background:rgba(255,255,255,.07); margin: 0 0 26px; }
+
+.reg-heading { font-size:1.2rem; font-weight:600; color:#e8eef4; margin-bottom:4px; }
+.reg-sub     { font-size:.84rem; color:var(--text-muted); margin-bottom:26px; }
+
+/* ── STEP INDICATOR ── */
+.step-bar {
+  display: flex; align-items: center;
+  gap: 0; margin-bottom: 28px;
+}
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 600;
+  border: 1px solid rgba(255,255,255,.15);
+  color: var(--text-muted);
+  transition: all .3s;
+  flex-shrink: 0;
+}
+.step-dot.active {
+  background: var(--rose); border-color: var(--rose); color: #fff;
+  box-shadow: 0 0 14px rgba(232,100,122,.4);
+}
+.step-dot.done {
+  background: rgba(232,100,122,.15); border-color: rgba(232,100,122,.3); color: var(--rose);
+}
+.step-line {
+  flex: 1; height: 1px;
+  background: rgba(255,255,255,.08);
+  transition: background .3s;
+}
+.step-line.done { background: rgba(232,100,122,.3); }
+.step-label {
+  font-size: .68rem; text-align: center;
+  color: var(--text-muted); margin-top: 5px; white-space: nowrap;
+}
+.step-label.active { color: var(--rose-light); }
+.step-label.done   { color: rgba(232,100,122,.6); }
+
+/* ── SECTION LABEL ── */
+.field-section {
+  font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(143,163,184,.5); margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  display: flex; align-items: center; gap: 8px;
+}
+.field-section i { font-size: .75rem; color: var(--rose); }
+
+/* ── FIELD LABEL ── */
+.f-label {
+  display: block;
+  font-size: .75rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 7px;
+}
+
+/* ── INPUT WRAPPER ── */
+.iw { position: relative; }
+.iw .ic {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: .88rem; pointer-events: none;
+  transition: color .25s;
+}
+.iw:focus-within .ic { color: var(--rose); }
+
+/* ── INPUTS ── */
+.reg-input, .reg-select {
+  width: 100% !important;
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 12px !important;
+  color: #e8eef4 !important;
+  font-size: .91rem !important;
+  transition: border-color .25s, box-shadow .25s, background .25s !important;
+  outline: none !important;
+}
+.reg-input {
+  padding: 12px 16px 12px 42px !important;
+}
+.reg-input.no-icon {
+  padding: 12px 16px !important;
+}
+.reg-input.pw-input {
+  padding: 12px 42px 12px 42px !important;
+}
+.reg-select {
+  padding: 12px 16px 12px 42px !important;
+  appearance: none; -webkit-appearance: none;
+  cursor: pointer;
+}
+.reg-input::placeholder { color: rgba(143,163,184,.45) !important; }
+.reg-input:focus, .reg-select:focus {
+  border-color: rgba(232,100,122,.45) !important;
+  box-shadow: 0 0 0 3px rgba(232,100,122,.1) !important;
+  background: rgba(255,255,255,.07) !important;
+}
+.reg-select option { background: #152336; color: #e8eef4; }
+
+/* select arrow */
+.select-arrow {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: .8rem; pointer-events: none;
+}
+
+/* password toggle */
+.pw-toggle {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; padding: 0;
+  color: var(--text-muted); cursor: pointer; font-size: .82rem;
+  transition: color .2s;
+}
+.pw-toggle:hover { color: #e8eef4; }
+
+/* ── FILE INPUT ── */
+.file-label {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.05);
+  border: 1px dashed rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: border-color .25s, background .25s;
+}
+.file-label:hover { border-color: rgba(232,100,122,.4); background: rgba(232,100,122,.04); }
+.file-label i { color: var(--rose-light); font-size: 1rem; }
+.file-label span { font-size: .86rem; color: var(--text-muted); }
+.file-label strong { font-size: .86rem; color: var(--rose-light); }
+input[type="file"] { display: none; }
+.file-name { font-size: .8rem; color: var(--rose-light); margin-top: 6px; display: none; }
+
+/* ── PASSWORD STRENGTH ── */
+.pw-strength-bar {
+  display: flex; gap: 4px; margin-top: 8px;
+}
+.pw-seg {
+  flex: 1; height: 3px; border-radius: 50px;
+  background: rgba(255,255,255,.08);
+  transition: background .3s;
+}
+.pw-seg.weak   { background: #ef4444; }
+.pw-seg.medium { background: var(--gold); }
+.pw-seg.strong { background: #22c55e; }
+.pw-strength-text { font-size: .72rem; color: var(--text-muted); margin-top: 5px; }
+
+/* ── SUBMIT ── */
+.btn-register {
+  width: 100%;
+  background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px; font-size: .95rem; font-weight: 500;
+  letter-spacing: .02em; cursor: pointer;
+  transition: opacity .25s, transform .2s, box-shadow .25s;
+  box-shadow: 0 8px 24px rgba(192,68,96,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px;
+}
+.btn-register:hover { opacity:.92; transform:translateY(-2px); box-shadow:0 12px 32px rgba(192,68,96,.45); }
+.btn-register:active { transform:translateY(0); }
+
+/* ── FOOTER ── */
+.reg-footer {
+  text-align: center; margin-top: 20px;
+  font-size: .85rem; color: var(--text-muted);
+}
+.reg-footer a { color: var(--rose); text-decoration: none; font-weight: 500; transition: color .2s; }
+.reg-footer a:hover { color: var(--rose-light); }
+
+.sec-note {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 18px; font-size: .72rem;
+  color: rgba(143,163,184,.45); letter-spacing: .03em;
+}
+
+/* ── ERRORS ── */
+.errorlist {
+  list-style: none; padding: 10px 14px;
+  background: rgba(232,100,122,.1);
+  border: 1px solid rgba(232,100,122,.25);
+  border-radius: 10px; margin-bottom: 18px;
+  font-size: .83rem; color: #f5a0ae;
+}
+.errorlist li::before { content: '⚠ '; }
+
+/* ── PASSWORD MATCH ── */
+.match-msg { font-size:.75rem; margin-top:5px; }
+.match-ok  { color: #4ade80; }
+.match-err { color: #f87171; }
+</style>
+
+<div class="reg-wrap">
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+
+  <div class="reg-card">
+
+    <!-- Brand -->
+    <div class="reg-brand">
+      <div class="brand-name">Mammo<span>AI</span></div>
+      <div class="brand-sub">Clinical AI Detection Platform</div>
+    </div>
+    <div class="reg-divider"></div>
+
+    <div class="reg-heading">Create your account</div>
+    <p class="reg-sub">Join the platform trusted by clinicians worldwide</p>
+
+    <!-- Step indicator -->
+    <div>
+      <div class="step-bar">
+        <div class="step-dot active" id="s1">1</div>
+        <div class="step-line" id="l1"></div>
+        <div class="step-dot" id="s2">2</div>
+        <div class="step-line" id="l2"></div>
+        <div class="step-dot" id="s3">3</div>
+      </div>
+      <div class="d-flex justify-content-between" style="margin-top:4px">
+        <span class="step-label active" id="sl1">Account</span>
+        <span class="step-label" id="sl2">Personal</span>
+        <span class="step-label" id="sl3">Security</span>
+      </div>
+    </div>
+
+    {% if form.non_field_errors %}
+      <ul class="errorlist mt-3">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" id="regForm">
+      {% csrf_token %}
+
+      <!-- ── STEP 1: Account Info ── -->
+      <div class="form-step" id="step1">
+        <div class="field-section mt-3">
+          <i class="fa fa-user"></i> Account Information
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_username">Username</label>
+          <div class="iw">
+            <i class="fa fa-at ic"></i>
+            <input type="text" name="username" id="id_username"
+                   class="reg-input" placeholder="Choose a username"
+                   autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_email">Email Address</label>
+          <div class="iw">
+            <i class="fa fa-envelope ic"></i>
+            <input type="email" name="email" id="id_email"
+                   class="reg-input" placeholder="your@email.com"
+                   autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_profile_pic">Profile Picture <span style="color:var(--text-muted);font-size:.7rem;text-transform:none;">(optional)</span></label>
+          <label class="file-label" for="id_profile_pic">
+            <i class="fa fa-camera"></i>
+            <div>
+              <strong>Choose photo</strong>
+              <span>&nbsp;or drag &amp; drop · JPG, PNG up to 5MB</span>
+            </div>
+          </label>
+          <input type="file" name="profile_pic" id="id_profile_pic" accept="image/*">
+          <div class="file-name" id="fileName"></div>
+        </div>
+
+        <button type="button" class="btn-register" onclick="goStep(2)">
+          Continue <i class="fa fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- ── STEP 2: Personal Info ── -->
+      <div class="form-step d-none" id="step2">
+        <div class="field-section mt-3">
+          <i class="fa fa-id-card"></i> Personal Details
+        </div>
+
+        <div class="row mb-3 g-3">
+          <div class="col-6">
+            <label class="f-label" for="id_age">Age</label>
+            <div class="iw">
+              <i class="fa fa-hashtag ic"></i>
+              <input type="number" name="age" id="id_age"
+                     class="reg-input" placeholder="e.g. 34"
+                     min="1" max="120" required>
+            </div>
+          </div>
+          <div class="col-6">
+            <label class="f-label" for="id_gender">Gender</label>
+            <div class="iw">
+              <i class="fa fa-venus-mars ic"></i>
+              <select name="gender" id="id_gender" class="reg-select" required>
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+              <i class="fa fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_dob">Date of Birth</label>
+          <div class="iw">
+            <i class="fa fa-calendar ic"></i>
+            <input type="date" name="dob" id="id_dob"
+                   class="reg-input no-icon" style="padding-left:42px !important" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_phone">Phone Number</label>
+          <div class="iw">
+            <i class="fa fa-phone ic"></i>
+            <input type="text" name="phone" id="id_phone"
+                   class="reg-input" placeholder="+1 (555) 000-0000"
+                   autocomplete="tel" required>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3">
+          <button type="button" class="btn-register" style="background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.12)" onclick="goStep(1)">
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="btn-register" onclick="goStep(3)">
+            Continue <i class="fa fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Security ── -->
+      <div class="form-step d-none" id="step3">
+        <div class="field-section mt-3">
+          <i class="fa fa-lock"></i> Set Password
+        </div>
+
+        <div class="mb-3">
+          <label class="f-label" for="id_password">Password</label>
+          <div class="iw">
+            <i class="fa fa-lock ic"></i>
+            <input type="password" name="password" id="id_password"
+                   class="reg-input pw-input" placeholder="Create a strong password"
+                   autocomplete="new-password" required>
+            <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Toggle password">
+              <i class="fa fa-eye" id="pwIcon1"></i>
+            </button>
+          </div>
+          <div class="pw-strength-bar">
+            <div class="pw-seg" id="ps1"></div>
+            <div class="pw-seg" id="ps2"></div>
+            <div class="pw-seg" id="ps3"></div>
+            <div class="pw-seg" id="ps4"></div>
+          </div>
+          <div class="pw-strength-text" id="pwStrText">Enter a password</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="f-label" for="id_confirm_password">Confirm Password</label>
+          <div class="iw">
+            <i class="fa fa-lock ic"></i>
+            <input type="password" name="confirm_password" id="id_confirm_password"
+                   class="reg-input pw-input" placeholder="Re-enter your password"
+                   autocomplete="new-password" required>
+            <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Toggle confirm password">
+              <i class="fa fa-eye" id="pwIcon2"></i>
+            </button>
+          </div>
+          <div class="match-msg" id="matchMsg"></div>
+        </div>
+
+        <div class="d-flex gap-3">
+          <button type="button" class="btn-register" style="background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.12)" onclick="goStep(2)">
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+          <button type="submit" class="btn-register">
+            <i class="fa fa-user-plus"></i> Create Account
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <p class="reg-footer">
+      Already have an account? <a href="{% url 'login' %}">Sign In</a>
+    </p>
+
+    <div class="sec-note">
+      <i class="fa fa-shield-halved" style="font-size:.72rem;"></i>
+      Your data is encrypted &amp; HIPAA-compliant
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ── Multi-step logic ── */
+  function goStep(n) {
+    [1,2,3].forEach(function(i){
+      document.getElementById('step'+i).classList.add('d-none');
+      var dot = document.getElementById('s'+i);
+      var lbl = document.getElementById('sl'+i);
+      dot.classList.remove('active','done');
+      lbl.classList.remove('active','done');
+      if(i < n){ dot.classList.add('done'); lbl.classList.add('done'); }
+      if(i === n){ dot.classList.add('active'); lbl.classList.add('active'); }
+    });
+    [1,2].forEach(function(i){
+      var l = document.getElementById('l'+i);
+      l.classList.toggle('done', i < n);
+    });
+    document.getElementById('step'+n).classList.remove('d-none');
+  }
+  window.goStep = goStep;
+
+  /* ── File picker label ── */
+  var fileInput = document.getElementById('id_profile_pic');
+  var fileNameEl = document.getElementById('fileName');
+  if(fileInput){
+    fileInput.addEventListener('change', function(){
+      if(this.files && this.files[0]){
+        fileNameEl.textContent = '✓ ' + this.files[0].name;
+        fileNameEl.style.display = 'block';
+      }
+    });
+  }
+
+  /* ── Password toggle ── */
+  function makePwToggle(btnId, iconId, inputId){
+    var btn  = document.getElementById(btnId);
+    var icon = document.getElementById(iconId);
+    var inp  = document.getElementById(inputId);
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      var show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      icon.className = show ? 'fa fa-eye-slash' : 'fa fa-eye';
+    });
+  }
+  makePwToggle('pwToggle1','pwIcon1','id_password');
+  makePwToggle('pwToggle2','pwIcon2','id_confirm_password');
+
+  /* ── Password strength ── */
+  var pwInput  = document.getElementById('id_password');
+  var segments = [document.getElementById('ps1'),document.getElementById('ps2'),document.getElementById('ps3'),document.getElementById('ps4')];
+  var strText  = document.getElementById('pwStrText');
+
+  function calcStrength(pw){
+    var score = 0;
+    if(pw.length >= 8)  score++;
+    if(/[A-Z]/.test(pw)) score++;
+    if(/[0-9]/.test(pw)) score++;
+    if(/[^A-Za-z0-9]/.test(pw)) score++;
+    return score;
+  }
+
+  var labels  = ['','Weak','Fair','Good','Strong'];
+  var classes = ['','weak','medium','medium','strong'];
+
+  if(pwInput){
+    pwInput.addEventListener('input', function(){
+      var score = calcStrength(this.value);
+      segments.forEach(function(seg,i){
+        seg.className = 'pw-seg';
+        if(i < score) seg.classList.add(classes[score]);
+      });
+      strText.textContent = this.value ? labels[score] : 'Enter a password';
+      strText.style.color = score >= 3 ? '#4ade80' : score === 2 ? '#d4a96a' : score === 1 ? '#f87171' : 'var(--text-muted)';
+    });
+  }
+
+  /* ── Password match ── */
+  var confInput = document.getElementById('id_confirm_password');
+  var matchMsg  = document.getElementById('matchMsg');
+
+  function checkMatch(){
+    if(!confInput.value) { matchMsg.textContent = ''; return; }
+    if(pwInput.value === confInput.value){
+      matchMsg.textContent = '✓ Passwords match';
+      matchMsg.className   = 'match-msg match-ok';
+    } else {
+      matchMsg.textContent = '✗ Passwords do not match';
+      matchMsg.className   = 'match-msg match-err';
+    }
+  }
+
+  if(confInput){ confInput.addEventListener('input', checkMatch); }
+  if(pwInput)  { pwInput.addEventListener('input',  checkMatch); }
+
+  /* ── Prevent submit if passwords don't match ── */
+  var regForm = document.getElementById('regForm');
+  if(regForm){
+    regForm.addEventListener('submit', function(e){
+      if(pwInput && confInput && pwInput.value !== confInput.value){
+        e.preventDefault();
+        matchMsg.textContent = '✗ Passwords do not match';
+        matchMsg.className   = 'match-msg match-err';
+        goStep(3);
+      }
+    });
+  }
+
+})();
+</script>
+
+{% endblock %}

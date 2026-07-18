@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+:root {
+  --rose:       #e8647a;
+  --rose-dark:  #c04460;
+  --navy:       #0d1b2a;
+  --navy-mid:   #152336;
+  --navy-light: #1e3351;
+  --text-muted: #8fa3b8;
+  --glass-bg:   rgba(255,255,255,0.04);
+  --glass-border:rgba(255,255,255,0.09);
+}
+
+body {
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  background: var(--navy);
+  min-height: 100vh;
+}
+
+.login-wrap {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* background radial glow */
+.login-wrap::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,68,96,.13) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* pulsing rings */
+.bg-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(232,100,122,.07);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: ring-breathe 5s ease-in-out infinite;
+}
+.bg-ring:nth-child(1){ width:480px; height:480px; animation-delay:0s; }
+.bg-ring:nth-child(2){ width:660px; height:660px; animation-delay:1.5s; }
+.bg-ring:nth-child(3){ width:860px; height:860px; animation-delay:3s; }
+@keyframes ring-breathe { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* card */
+.login-card {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 420px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 24px;
+  padding: 40px 36px;
+  backdrop-filter: blur(20px);
+  animation: card-in .55s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes card-in {
+  from { opacity:0; transform: translateY(22px) scale(.98); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* brand mark */
+.login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.login-brand .brand-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.01em;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.login-brand .brand-name span { color: var(--rose); }
+.login-brand .brand-sub {
+  font-size: .78rem;
+  color: var(--text-muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* divider */
+.login-divider {
+  height: 1px;
+  background: rgba(255,255,255,.07);
+  margin: 0 0 28px;
+}
+
+/* heading */
+.login-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e8eef4;
+  margin-bottom: 6px;
+}
+.login-subheading {
+  font-size: .85rem;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+/* labels */
+.field-label {
+  display: block;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+/* inputs */
+.login-input {
+  width: 100%;
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 12px !important;
+  color: #e8eef4 !important;
+  padding: 13px 16px 13px 44px !important;
+  font-size: .92rem !important;
+  transition: border-color .25s, box-shadow .25s !important;
+  outline: none !important;
+}
+.login-input::placeholder { color: rgba(143,163,184,.5) !important; }
+.login-input:focus {
+  border-color: rgba(232,100,122,.45) !important;
+  box-shadow: 0 0 0 3px rgba(232,100,122,.1) !important;
+  background: rgba(255,255,255,.07) !important;
+}
+
+/* input wrapper for icon */
+.input-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: .9rem;
+  pointer-events: none;
+  transition: color .25s;
+}
+.input-wrap:focus-within .input-icon { color: var(--rose); }
+
+/* password toggle */
+.pw-toggle {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none; padding: 0;
+  color: var(--text-muted);
+  cursor: pointer; font-size: .85rem;
+  transition: color .2s;
+}
+.pw-toggle:hover { color: #e8eef4; }
+
+/* submit button */
+.btn-login {
+  width: 100%;
+  background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: .95rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: opacity .25s, transform .2s, box-shadow .25s;
+  box-shadow: 0 8px 24px rgba(192,68,96,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px;
+}
+.btn-login:hover {
+  opacity: .92;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(192,68,96,.45);
+}
+.btn-login:active { transform: translateY(0); }
+
+/* footer link */
+.login-footer {
+  text-align: center;
+  margin-top: 22px;
+  font-size: .86rem;
+  color: var(--text-muted);
+}
+.login-footer a {
+  color: #e8647a;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color .2s;
+}
+.login-footer a:hover { color: #f5a0ae; }
+
+/* security note */
+.security-note {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 20px;
+  font-size: .74rem;
+  color: rgba(143,163,184,.5);
+  letter-spacing: .03em;
+}
+
+/* Django form error styling */
+.errorlist {
+  list-style: none;
+  padding: 10px 14px;
+  background: rgba(232,100,122,.1);
+  border: 1px solid rgba(232,100,122,.25);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  font-size: .84rem;
+  color: #f5a0ae;
+}
+.errorlist li::before { content: '⚠ '; }
+</style>
+
+<div class="login-wrap">
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="brand-name">Mammo<span>AI</span></div>
+      <div class="brand-sub">Clinical AI Detection Platform</div>
+    </div>
+    <div class="login-divider"></div>
+
+    <div class="login-heading">Welcome back</div>
+    <p class="login-subheading">Sign in to access your diagnostic dashboard</p>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <ul class="errorlist">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- Username -->
+      <label class="field-label" for="id_username">Username</label>
+      <div class="input-wrap">
+        <i class="fa fa-user input-icon"></i>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          class="login-input"
+          placeholder="Enter your username"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <!-- Password -->
+      <label class="field-label" for="id_password">Password</label>
+      <div class="input-wrap">
+        <i class="fa fa-lock input-icon"></i>
+        <input
+          type="password"
+          name="password"
+          id="id_password"
+          class="login-input"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">
+          <i class="fa fa-eye" id="pwIcon"></i>
+        </button>
+      </div>
+
+      <button type="submit" class="btn-login">
+        <i class="fa fa-sign-in-alt"></i> Sign In
+      </button>
+
+    </form>
+
+    <p class="login-footer">
+      Don't have an account?
+      <a href="{% url 'register' %}">Create Account</a>
+    </p>
+
+    <div class="security-note">
+      <i class="fa fa-shield-halved" style="font-size:.78rem;color:rgba(143,163,184,.4)"></i>
+      Encrypted &amp; HIPAA-compliant
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var btn  = document.getElementById('pwToggle');
+  var inp  = document.getElementById('id_password');
+  var icon = document.getElementById('pwIcon');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    icon.className = show ? 'fa fa-eye-slash' : 'fa fa-eye';
+  });
+})();
+</script>
+
+{% endblock %}
